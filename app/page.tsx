@@ -1,65 +1,394 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
+import { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
+import { motion, AnimatePresence } from 'framer-motion';
+import { productsData, seriesOrder, Product, Spec } from './data/products';
+
+export default function Catalogo() {
+  const [activeSeries, setActiveSeries] = useState<string>("Todos");
+  const [showSplash, setShowSplash] = useState(true);
+  const [isMuted, setIsMuted] = useState(false);
+  const [selectedInterest, setSelectedInterest] = useState<{ product: Product, colorName: string } | null>(null);
+  const [toastMessage, setToastMessage] = useState<string | null>(null); // Estado da Notificação Premium
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  // Controle inteligente de Autoplay
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    audio.volume = 0.2;
+
+    const tentarTocarSom = async () => {
+      try {
+        await audio.play();
+        removerGanchosDeInteracao();
+      } catch (err) {
+        console.log("Autoplay bloqueado. Aguardando interação...");
+      }
+    };
+
+    const interacaoUsuario = () => tentarTocarSom();
+
+    const adicionarGanchosDeInteracao = () => {
+      window.addEventListener('click', interacaoUsuario);
+      window.addEventListener('touchstart', interacaoUsuario);
+    };
+
+    const removerGanchosDeInteracao = () => {
+      window.removeEventListener('click', interacaoUsuario);
+      window.removeEventListener('touchstart', interacaoUsuario);
+    };
+
+    tentarTocarSom();
+    adicionarGanchosDeInteracao();
+
+    const timer = setTimeout(() => { setShowSplash(false); }, 4000);
+
+    return () => {
+      clearTimeout(timer);
+      removerGanchosDeInteracao();
+    };
+  }, []);
+
+  const toggleMute = () => {
+    if (audioRef.current) {
+      audioRef.current.muted = !isMuted;
+      setIsMuted(!isMuted);
+    }
+  };
+
+  const filteredProducts = activeSeries === "Todos" 
+    ? productsData 
+    : productsData.filter(p => p.series === activeSeries);
+
+  // Função de Cópia com Notificação Premium
+  const handleCopyAndClose = async () => {
+    if (!selectedInterest) return;
+    
+    const { product, colorName } = selectedInterest;
+    const textoMensagem = `eu gostei deste modelo ${product.name} e a cor ${colorName} quero realizar uma agenda para eu visitar na loja`;
+    
+    try {
+      await navigator.clipboard.writeText(textoMensagem);
+      
+      // Aciona o aviso bonito no topo da tela
+      setToastMessage("Mensagem copiada com sucesso! Cole no chat.");
+      setTimeout(() => setToastMessage(null), 4000); // Some após 4s
+      
+    } catch (err) {
+      console.log("Não foi possível copiar automaticamente.");
+    }
+
+    setSelectedInterest(null);
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <div className="min-h-screen bg-[#F6F5F1] text-[#101012] font-sans selection:bg-[#FFDE00] selection:text-black">
+      <audio ref={audioRef} src="/audio/background.mp3" loop />
+
+      {/* TOAST NOTIFICATION (Substituto do alert) */}
+      <AnimatePresence>
+        {toastMessage && (
+          <motion.div 
+            initial={{ opacity: 0, y: -50, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.9 }}
+            className="fixed top-24 left-1/2 transform -translate-x-1/2 z-[300] bg-[#101012] text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 border border-white/10"
+          >
+            <div className="w-5 h-5 rounded-full bg-[#FFDE00] flex items-center justify-center">
+              <svg className="w-3 h-3 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <span className="text-xs font-bold tracking-wide">{toastMessage}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* MODAL DE INTERESSE (Premium) */}
+      <AnimatePresence>
+        {selectedInterest && (
+          <motion.div 
+            className="fixed inset-0 z-[200] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div 
+              className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl relative overflow-hidden"
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+            >
+              <div className="absolute top-0 left-0 right-0 h-2 bg-[#FFDE00]" />
+              
+              <button 
+                onClick={() => setSelectedInterest(null)}
+                className="absolute top-4 right-4 text-gray-400 hover:text-black transition-colors bg-gray-50 hover:bg-gray-100 p-2 rounded-full"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+              </button>
+
+              <div className="mt-2 text-center">
+                <span className="inline-block bg-[#00C2A8]/10 text-[#00C2A8] text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full mb-4">
+                  Excelente Escolha
+                </span>
+                
+                <h2 className="text-2xl font-black tracking-tight mb-2">
+                  Opa, perfeito!
+                </h2>
+                
+                <p className="text-sm text-gray-600 mb-6 leading-relaxed">
+                  Você gostou do modelo <strong className="text-black">{selectedInterest.product.name}</strong> na cor <strong className="text-black">{selectedInterest.colorName}</strong>.
+                </p>
+
+                <div className="bg-gray-50 border border-gray-100 p-5 rounded-xl text-left mb-6 shadow-inner">
+                  <p className="text-xs text-gray-500 mb-2 font-bold uppercase flex items-center gap-2">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Passo a Passo:
+                  </p>
+                  <p className="text-sm text-gray-700 italic">
+                    Com gentileza, clique no botão abaixo para copiar a mensagem com o modelo que você desejou. Depois, envie no chat de atendimento para agendar sua visita à loja!
+                  </p>
+                </div>
+
+                <button 
+                  onClick={handleCopyAndClose}
+                  className="w-full bg-[#101012] text-white py-4 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-[#FFDE00] hover:text-black active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+                  Copiar Mensagem e Fechar
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* SPLASH SCREEN */}
+      <AnimatePresence>
+        {showSplash && (
+          <motion.div 
+            className="fixed inset-0 z-[100] bg-[#101012] flex flex-col items-center justify-center text-center p-6"
+            exit={{ opacity: 0, scale: 1.05 }}
+            transition={{ duration: 0.8, ease: "easeInOut" }}
+          >
+            <div className="space-y-8 max-w-lg">
+              <motion.h1 
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                className="text-5xl font-mono font-bold text-white tracking-tighter"
+              >
+                real<span className="text-[#FFDE00]">me</span>
+              </motion.h1>
+
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.4, duration: 0.8 }}
+                className="space-y-3"
+              >
+                <p className="text-white text-lg font-light tracking-wider leading-relaxed">
+                  Seja bem-vindo ao catálogo realme.
+                </p>
+                <p className="text-[#FFDE00] text-xs font-bold tracking-[0.25em] uppercase">
+                  Fique à vontade para ver o nosso catálogo.
+                </p>
+              </motion.div>
+
+              <div className="w-40 h-[2px] bg-white/10 mx-auto rounded-full overflow-hidden relative">
+                <motion.div 
+                  initial={{ left: "-100%" }}
+                  animate={{ left: "100%" }}
+                  transition={{ repeat: Infinity, duration: 1.8, ease: "easeInOut" }}
+                  className="absolute top-0 bottom-0 w-1/2 bg-[#FFDE00] rounded-full shadow-[0_0_8px_#FFDE00]"
+                />
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* HEADER */}
+      <header className="sticky top-0 z-50 bg-[#101012]/95 backdrop-blur-md border-b border-[#FFDE00]/25 shadow-md">
+        <div className="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+          <div className="text-2xl font-bold text-white font-mono tracking-tighter">
+            real<span className="text-[#FFDE00]">me</span>
+          </div>
+          
+          <div className="flex items-center gap-6">
+            <span className="hidden sm:inline-block text-[10px] text-white/50 tracking-[0.2em] uppercase font-bold font-mono">
+              Catálogo Oficial
+            </span>
+            <button 
+              onClick={toggleMute} 
+              className="flex items-center gap-2 text-[#FFDE00] text-xs font-bold uppercase tracking-widest hover:opacity-80 transition-all bg-white/5 px-4 py-2 rounded-full border border-white/10"
+            >
+              <span className="relative flex h-2 w-2">
+                {!isMuted && (
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00C2A8] opacity-75"></span>
+                )}
+                <span className={`relative inline-flex rounded-full h-2 w-2 ${isMuted ? 'bg-red-500' : 'bg-[#00C2A8]'}`}></span>
+              </span>
+              {isMuted ? 'MUTE: OFF' : 'MUTE: ON'}
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* MAIN */}
+      <main className="max-w-6xl mx-auto px-6 py-12">
+        <div className="mb-12">
+          <span className="inline-block text-[10px] font-bold tracking-[0.2em] uppercase bg-[#00C2A8]/10 text-[#00C2A8] px-3 py-1 rounded-sm mb-3">
+            dare to leap
+          </span>
+          <h1 className="text-4xl font-black tracking-tight mb-2 text-[#101012]">
+            Navegue pela nossa seleção.
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+          <p className="text-sm text-gray-500">Toque nas cores para alterar a imagem e escolha o seu modelo favorito.</p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        {/* FILTROS */}
+        <div className="flex gap-3 mb-12 overflow-x-auto pb-3 scrollbar-hide">
+          {seriesOrder.map(s => (
+            <button 
+              key={s} 
+              onClick={() => setActiveSeries(s)} 
+              className={`px-6 py-2.5 rounded-full text-xs font-bold transition-all duration-300 ${
+                s === activeSeries 
+                  ? 'bg-[#FFDE00] text-black shadow-lg border-transparent scale-105' 
+                  : 'bg-white text-[#101012] border border-black/5 hover:border-black/20 hover:bg-gray-50'
+              }`}
+            >
+              {s}
+            </button>
+          ))}
         </div>
+
+        {/* GRID DE PRODUTOS */}
+        <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pb-24">
+          <AnimatePresence>
+            {filteredProducts.map(p => (
+              <ProductCard 
+                key={p.id} 
+                product={p} 
+                onInterest={(prod, color) => setSelectedInterest({ product: prod, colorName: color })}
+              />
+            ))}
+          </AnimatePresence>
+        </motion.div>
       </main>
+
+      {/* FOOTER */}
+      <footer className="border-t border-black/5 py-8 bg-[#101012] text-white/40 text-[10px] font-mono text-center">
+        <p className="tracking-widest uppercase mb-1">realme Catálogo Oficial</p>
+        <p className="mt-2 text-white/20">Desenvolvido por Technology Vision</p>
+      </footer>
     </div>
+  );
+}
+
+// COMPONENTE CARD (Sua Estrutura + Acabamento Premium)
+function ProductCard({ product, onInterest }: { product: Product, onInterest: (p: Product, color: string) => void }) {
+  const [colorIndex, setColorIndex] = useState(0);
+  const activeColor = product.colors[colorIndex];
+
+  return (
+    <motion.div 
+      layout
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      transition={{ duration: 0.4 }}
+      className="group bg-white rounded-3xl p-6 border border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-500 flex flex-col justify-between"
+    >
+      <div>
+        {/* Tag Categoria */}
+        <div className="flex justify-between items-start mb-4">
+          <span className="text-[9px] font-bold tracking-widest uppercase bg-gray-50 text-gray-500 px-3 py-1.5 rounded-full border border-gray-100">
+            {product.series}
+          </span>
+        </div>
+
+        {/* Imagem do Produto com Efeito Float */}
+        <div className="relative h-64 w-full mb-6 overflow-hidden flex items-center justify-center">
+          <Image 
+            src={activeColor.imageUrl} 
+            alt={product.name} 
+            fill 
+            sizes="(max-width: 768px) 100vw, 33vw"
+            className="object-contain transform group-hover:scale-105 group-hover:-translate-y-2 transition-all duration-500 ease-out drop-shadow-md" 
+          />
+        </div>
+
+        {/* Info Básica */}
+        <h3 className="text-xl font-bold tracking-tight mb-1 text-black">{product.name}</h3>
+        <p className="text-[12px] text-gray-500 leading-relaxed mb-6 h-10">{product.highlight}</p>
+      </div>
+
+      <div className="space-y-5">
+        {/* Seletor de Cores */}
+        <div className="flex items-center justify-between">
+          <div className="flex gap-2">
+            {product.colors.map((c, i) => (
+              <button 
+                key={c.name} 
+                onClick={() => setColorIndex(i)} 
+                className={`w-6 h-6 rounded-full border-[3px] transition-all duration-300 ${
+                  colorIndex === i ? 'border-gray-200 scale-110 shadow-sm' : 'border-transparent hover:scale-105'
+                }`} 
+                style={{ backgroundColor: c.hex }} 
+                title={c.name}
+              />
+            ))}
+          </div>
+          <span className="text-[10px] font-mono font-bold tracking-widest text-black/40 uppercase bg-gray-50 px-2 py-1 rounded">
+            {activeColor.name}
+          </span>
+        </div>
+
+        {/* ESPECIFICAÇÕES TÉCNICAS (Nas caixinhas cinzas que você gosta) */}
+        <div className="grid grid-cols-2 gap-2.5">
+          {product.specs.slice(0, 4).map((s: Spec, i: number) => (
+            <div key={i} className="bg-[#F9F9F9] p-3 rounded-xl border border-gray-100 group-hover:border-gray-200 transition-colors">
+              <span className="block text-[8px] uppercase tracking-wider text-[#00C2A8] font-black mb-0.5">
+                {s.label}
+              </span>
+              <span className="block text-[11px] font-bold text-[#101012] truncate">
+                {s.value}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        {/* ÁREA DE PREÇOS E NOTA LEGAL (Na caixinha que você gosta) */}
+        <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 shadow-inner">
+          <div className="flex justify-between items-end mb-2">
+            <span className="text-[10px] uppercase font-bold text-gray-500 tracking-wider">Débito/Pix:</span>
+            <span className="text-[15px] font-black text-[#101012] leading-none">{product.priceDebit}</span>
+          </div>
+          <div className="flex justify-between items-end mb-3">
+            <span className="text-[10px] uppercase font-bold text-gray-500 tracking-wider">Crédito:</span>
+            <span className="text-[15px] font-black text-[#101012] leading-none">{product.priceCredit}</span>
+          </div>
+          <div className="border-t border-gray-200 pt-2 mt-1">
+            <p className="text-[8.5px] text-gray-400 font-medium italic leading-tight text-justify">
+              {product.paymentNote}
+            </p>
+          </div>
+        </div>
+
+        {/* Botão de Ação */}
+        <button 
+          onClick={() => onInterest(product, activeColor.name)} 
+          className="w-full bg-[#101012] text-white hover:bg-black py-4 rounded-2xl font-bold text-xs uppercase tracking-widest active:scale-[0.98] hover:shadow-lg transition-all duration-300"
+        >
+          Tenho interesse
+        </button>
+      </div>
+    </motion.div>
   );
 }
