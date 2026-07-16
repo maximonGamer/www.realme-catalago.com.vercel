@@ -42,7 +42,7 @@ export const productsData: Product[] = [
     name: 'NOTE 70',
     highlight: 'Bateria de longa duração e performance.',
     specs: [
-      { label: 'Processador', value: 'Unisoc T612' },
+      { label: 'Processador', value: 'Unisoc T7250' },
       { label: 'Tela', value: '6,74” 90Hz' },
       { label: 'RAM', value: '8GB' },
       { label: 'Armazenamento', value: '256GB' },
@@ -61,7 +61,7 @@ export const productsData: Product[] = [
     name: 'NOTE 60X',
     highlight: 'Tela fluida e processamento rápido.',
     specs: [
-      { label: 'Processador', value: 'Unisoc T612' },
+      { label: 'Processador', value: 'Unisoc octa core' },
       { label: 'Tela', value: '6,74” 90Hz' },
       { label: 'RAM', value: '3GB' },
       { label: 'Armazenamento', value: '64GB' },
@@ -79,7 +79,7 @@ export const productsData: Product[] = [
     name: 'NOTE 60',
     highlight: 'Desempenho consistente e bateria de 5.000mAh.',
     specs: [
-      { label: 'Processador', value: 'Unisoc T612' },
+      { label: 'Processador', value: 'Unisoc octa core' },
       { label: 'Tela', value: '6,74”' },
       { label: 'RAM', value: '4GB' },
       { label: 'Armazenamento', value: '128GB' },
@@ -139,8 +139,8 @@ export const productsData: Product[] = [
     name: 'C63',
     highlight: 'Design em couro e ótima performance.',
     specs: [
-      { label: 'Processador', value: 'Unisoc T612' },
-      { label: 'Tela', value: '6,74”' },
+      { label: 'Processador', value: 'Unisoc Octa core' },
+      { label: 'Tela', value: '6,74 90Hz”' },
       { label: 'RAM', value: '8GB' },
       { label: 'Armazenamento', value: '256GB' },
     ],
@@ -159,16 +159,16 @@ export const productsData: Product[] = [
     highlight: 'O novo padrão de entrada da realme.',
     specs: [
       { label: 'Processador', value: 'UNISOC T7250' },
-      { label: 'Tela', value: '6,7”' },
+      { label: 'Tela', value: '6,7 120Hz”' },
       { label: 'RAM', value: '4GB' },
-      { label: 'Bateria', value: '5.000mAh' },
+      { label: 'Bateria', value: '7.000mAh' },
     ],
     colors: [
       { name: 'Violeta', hex: '#bf9fe6', imageUrl: '/images/c100i-purple.webp' },
       { name: 'Cinza', hex: '#8a8a85', imageUrl: '/images/c100i-gray.webp' },
     ],
-    priceDebit: 'Sob consulta',
-    priceCredit: 'Consulte na loja',
+    priceDebit: 'R$ 2.247,00',
+    priceCredit: '12x de R$ 187,25',
     paymentNote: officialDisclaimer
   },
   {
@@ -178,7 +178,7 @@ export const productsData: Product[] = [
     highlight: 'Lançamento com foco em autonomia.',
     specs: [
       { label: 'Processador', value: 'Snapdragon 685' },
-      { label: 'Tela', value: '6,7”' },
+      { label: 'Tela', value: '6,7  144Hz”' },
       { label: 'RAM', value: '8GB' },
       { label: 'Armazenamento', value: '256GB' },
     ],
@@ -201,7 +201,7 @@ export const productsData: Product[] = [
     highlight: 'Conectividade 5G com potência.',
     specs: [
       { label: 'Processador', value: 'Dimensity 6300 5G' },
-      { label: 'Tela', value: '6,67” AMOLED' },
+      { label: 'Tela', value: '6,67” AMOLED 120Hz' },
       { label: 'RAM', value: '8GB' },
       { label: 'Armazenamento', value: '256GB' },
     ],
