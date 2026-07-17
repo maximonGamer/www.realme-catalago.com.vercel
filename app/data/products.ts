@@ -80,7 +80,7 @@ export const productsData: Product[] = [
     highlight: 'Desempenho consistente e bateria de 5.000mAh.',
     specs: [
       { label: 'Processador', value: 'Unisoc octa core' },
-      { label: 'Tela', value: '6,74”' },
+      { label: 'Tela', value: '6,74” 90Hz' },
       { label: 'RAM', value: '4GB' },
       { label: 'Armazenamento', value: '128GB' },
     ],
