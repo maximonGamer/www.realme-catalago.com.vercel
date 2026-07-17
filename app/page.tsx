@@ -3,15 +3,15 @@
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-// Buscando os dados tipados do seu banco de dados
-import { productsData, seriesOrder, Product, Spec, Color } from '../app/data/products';
+// Adicionado o "Color" na importação para evitar erros no TypeScript
+import { productsData, seriesOrder, Product, Spec, Color } from './data/products';
 
 export default function Catalogo() {
   const [activeSeries, setActiveSeries] = useState<string>("Todos");
   const [showSplash, setShowSplash] = useState(true);
   const [isMuted, setIsMuted] = useState(false);
   const [selectedInterest, setSelectedInterest] = useState<{ product: Product, colorName: string } | null>(null);
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [toastMessage, setToastMessage] = useState<string | null>(null); // Estado da Notificação Premium
   const audioRef = useRef<HTMLAudioElement>(null);
 
   // Controle inteligente de Autoplay
@@ -62,18 +62,27 @@ export default function Catalogo() {
 
   const filteredProducts = activeSeries === "Todos" 
     ? productsData 
+    // Tipagem adicionada: (p: Product)
     : productsData.filter((p: Product) => p.series === activeSeries);
 
-  // Redirecionamento Profissional ao WhatsApp com Mensagem Formatada
-  const handleContactSpecialist = () => {
+  // Função de Cópia com Notificação Premium MANTIDA DA ORIGINAL
+  const handleCopyAndClose = async () => {
     if (!selectedInterest) return;
     
     const { product, colorName } = selectedInterest;
-    const telefone = "5511900000000"; // Insira aqui o seu WhatsApp de suporte/vendas
+    const textoMensagem = `eu gostei deste modelo ${product.name} e a cor ${colorName} quero realizar uma agenda para eu visitar na loja`;
     
-    const textoMensagem = `Olá! Gostei muito do modelo *${product.name}* na cor *${colorName}*. Gostaria de verificar a disponibilidade física para agendarmos a minha visita na loja!`;
-    
-    window.open(`https://wa.me/${telefone}?text=${encodeURIComponent(textoMensagem)}`, '_blank');
+    try {
+      await navigator.clipboard.writeText(textoMensagem);
+      
+      // Aciona o aviso bonito no topo da tela
+      setToastMessage("Mensagem copiada com sucesso! Cole no chat.");
+      setTimeout(() => setToastMessage(null), 4000); // Some após 4s
+      
+    } catch (err) {
+      console.log("Não foi possível copiar automaticamente.");
+    }
+
     setSelectedInterest(null);
   };
 
@@ -81,7 +90,7 @@ export default function Catalogo() {
     <div className="min-h-screen bg-[#F6F5F1] text-[#101012] font-sans selection:bg-[#FFDE00] selection:text-black">
       <audio ref={audioRef} src="/audio/background.mp3" loop />
 
-      {/* TOAST NOTIFICATION */}
+      {/* TOAST NOTIFICATION (Substituto do alert) */}
       <AnimatePresence>
         {toastMessage && (
           <motion.div 
@@ -100,7 +109,7 @@ export default function Catalogo() {
         )}
       </AnimatePresence>
 
-      {/* MODAL DE INTERESSE DIRECIONADO */}
+      {/* MODAL DE INTERESSE (Premium) */}
       <AnimatePresence>
         {selectedInterest && (
           <motion.div 
@@ -110,7 +119,7 @@ export default function Catalogo() {
             exit={{ opacity: 0 }}
           >
             <motion.div 
-              className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl relative overflow-hidden animate-sharp"
+              className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl relative overflow-hidden"
               initial={{ scale: 0.9, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.9, y: 20 }}
@@ -134,33 +143,26 @@ export default function Catalogo() {
                 </h2>
                 
                 <p className="text-sm text-gray-600 mb-6 leading-relaxed">
-                  Fico muito feliz que você gostou do modelo <strong className="text-black">{selectedInterest.product.name}</strong> na cor <strong className="text-black">{selectedInterest.colorName}</strong>.
+                  Você gostou do modelo <strong className="text-black">{selectedInterest.product.name}</strong> na cor <strong className="text-black">{selectedInterest.colorName}</strong>.
                 </p>
 
-                <div className="bg-gray-50 border border-gray-100 p-5 rounded-xl text-left mb-6 shadow-inner space-y-1">
-                  <span className="block text-[9px] uppercase tracking-wider text-gray-400 font-bold">Modelo Selecionado</span>
-                  <span className="block text-sm font-black text-black">{selectedInterest.product.name} — {selectedInterest.colorName}</span>
-                  <span className="block text-xs font-semibold text-[#00C2A8] mt-1">À vista por {selectedInterest.product.priceDebit}</span>
+                <div className="bg-gray-50 border border-gray-100 p-5 rounded-xl text-left mb-6 shadow-inner">
+                  <p className="text-xs text-gray-500 mb-2 font-bold uppercase flex items-center gap-2">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Passo a Passo:
+                  </p>
+                  <p className="text-sm text-gray-700 italic">
+                    Com gentileza, clique no botão abaixo para copiar a mensagem com o modelo que você desejou. Depois, envie no chat de atendimento para agendar sua visita à loja!
+                  </p>
                 </div>
 
-                <p className="text-xs text-gray-500 leading-relaxed mb-6">
-                  Por gentileza, retorne com o nosso especialista de atendimento e informe o modelo e a cor de sua preferência para agendarmos sua visita à loja!
-                </p>
-
-                <div className="flex flex-col gap-2">
-                  <button 
-                    onClick={handleContactSpecialist}
-                    className="w-full bg-[#101012] text-[#FFDE00] py-4 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-black active:scale-[0.98] transition-all flex items-center justify-center gap-2"
-                  >
-                    Falar com Especialista
-                  </button>
-                  <button 
-                    onClick={() => setSelectedInterest(null)}
-                    className="w-full bg-transparent text-gray-500 hover:text-black py-2 rounded-xl font-bold text-xs uppercase tracking-widest transition-all"
-                  >
-                    Voltar ao Catálogo
-                  </button>
-                </div>
+                <button 
+                  onClick={handleCopyAndClose}
+                  className="w-full bg-[#101012] text-white py-4 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-[#FFDE00] hover:text-black active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+                  Copiar Mensagem e Fechar
+                </button>
               </div>
             </motion.div>
           </motion.div>
@@ -253,6 +255,7 @@ export default function Catalogo() {
 
         {/* FILTROS */}
         <div className="flex gap-3 mb-12 overflow-x-auto pb-3 scrollbar-hide">
+          {/* Tipagem adicionada: (s: string) */}
           {seriesOrder.map((s: string) => (
             <button 
               key={s} 
@@ -271,11 +274,12 @@ export default function Catalogo() {
         {/* GRID DE PRODUTOS */}
         <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pb-24">
           <AnimatePresence>
+            {/* Tipagem adicionada: (p: Product) */}
             {filteredProducts.map((p: Product) => (
               <ProductCard 
                 key={p.id} 
                 product={p} 
-                onInterest={(prod: Product, color: string) => setSelectedInterest({ product: prod, colorName: color })}
+                onInterest={(prod, color) => setSelectedInterest({ product: prod, colorName: color })}
               />
             ))}
           </AnimatePresence>
@@ -291,14 +295,9 @@ export default function Catalogo() {
   );
 }
 
-// COMPONENTE CARD (Design Premium com NFC Dinâmico e Preços Oficiais)
-interface ProductCardProps {
-  product: Product;
-  onInterest: (p: Product, colorName: string) => void;
-}
-
-function ProductCard({ product, onInterest }: ProductCardProps) {
-  const [colorIndex, setColorIndex] = useState<number>(0);
+// COMPONENTE CARD (Sua Estrutura Original + INDICADOR NFC)
+function ProductCard({ product, onInterest }: { product: Product, onInterest: (p: Product, color: string) => void }) {
+  const [colorIndex, setColorIndex] = useState(0);
   const activeColor = product.colors[colorIndex];
 
   return (
@@ -311,12 +310,13 @@ function ProductCard({ product, onInterest }: ProductCardProps) {
       className="group bg-white rounded-3xl p-6 border border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-500 flex flex-col justify-between"
     >
       <div>
-        {/* Categoria/Série & Status do NFC */}
+        {/* Tag Categoria e NFC */}
         <div className="flex justify-between items-center mb-4">
           <span className="text-[9px] font-bold tracking-widest uppercase bg-gray-50 text-gray-500 px-3 py-1.5 rounded-full border border-gray-100">
             {product.series}
           </span>
           
+          {/* LÓGICA DO NFC AQUI: Verde se tiver, Cinza se não tiver */}
           {product.hasNFC ? (
             <span className="text-[8px] font-black tracking-wider uppercase bg-[#00C2A8]/10 text-[#00C2A8] px-2.5 py-1 rounded-md flex items-center gap-1">
               <span className="h-1.5 w-1.5 rounded-full bg-[#00C2A8]"></span>
@@ -329,7 +329,7 @@ function ProductCard({ product, onInterest }: ProductCardProps) {
           )}
         </div>
 
-        {/* Imagem do Produto */}
+        {/* Imagem do Produto com Efeito Float */}
         <div className="relative h-64 w-full mb-6 overflow-hidden flex items-center justify-center">
           <Image 
             src={activeColor.imageUrl} 
@@ -349,6 +349,7 @@ function ProductCard({ product, onInterest }: ProductCardProps) {
         {/* Seletor de Cores */}
         <div className="flex items-center justify-between">
           <div className="flex gap-2">
+            {/* Tipagem adicionada: (c: Color, i: number) */}
             {product.colors.map((c: Color, i: number) => (
               <button 
                 key={c.name} 
@@ -366,7 +367,7 @@ function ProductCard({ product, onInterest }: ProductCardProps) {
           </span>
         </div>
 
-        {/* GRID DE ESPECIFICAÇÕES TÉCNICAS */}
+        {/* ESPECIFICAÇÕES TÉCNICAS (Nas caixinhas cinzas) */}
         <div className="grid grid-cols-2 gap-2.5">
           {product.specs.slice(0, 4).map((s: Spec, i: number) => (
             <div key={i} className="bg-[#F9F9F9] p-3 rounded-xl border border-gray-100 group-hover:border-gray-200 transition-colors">
@@ -380,7 +381,7 @@ function ProductCard({ product, onInterest }: ProductCardProps) {
           ))}
         </div>
 
-        {/* ÁREA DE PREÇOS E NOTA LEGAL */}
+        {/* ÁREA DE PREÇOS E NOTA LEGAL (Original) */}
         <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 shadow-inner">
           <div className="flex justify-between items-end mb-2">
             <span className="text-[10px] uppercase font-bold text-gray-500 tracking-wider">Débito/Pix:</span>
