@@ -21,6 +21,7 @@ export interface Product {
   priceDebit: string;
   priceCredit: string;
   paymentNote: string;
+  hasNFC: boolean; // TRUE = Possui NFC | FALSE = Não possui NFC
 }
 
 export const seriesOrder: string[] = [
@@ -53,7 +54,8 @@ export const productsData: Product[] = [
     ],
     priceDebit: 'R$ 1.699,90',
     priceCredit: '12x de R$ 141,66',
-    paymentNote: officialDisclaimer
+    paymentNote: officialDisclaimer,
+    hasNFC: false
   },
   {
     id: 'note60x',
@@ -71,7 +73,8 @@ export const productsData: Product[] = [
     ],
     priceDebit: 'R$ 899,90',
     priceCredit: '12x de R$ 74,99',
-    paymentNote: officialDisclaimer
+    paymentNote: officialDisclaimer,
+    hasNFC: false
   },
   {
     id: 'note60',
@@ -89,7 +92,8 @@ export const productsData: Product[] = [
     ],
     priceDebit: 'R$ 1.290,00',
     priceCredit: '12x de R$ 107,50',
-    paymentNote: officialDisclaimer
+    paymentNote: officialDisclaimer,
+    hasNFC: false
   },
 
   // =========================
@@ -112,7 +116,8 @@ export const productsData: Product[] = [
     ],
     priceDebit: 'R$ 2.247,00',
     priceCredit: '12x de R$ 187,25',
-    paymentNote: officialDisclaimer
+    paymentNote: officialDisclaimer,
+    hasNFC: true
   },
   {
     id: 'c71',
@@ -131,7 +136,8 @@ export const productsData: Product[] = [
     ],
     priceDebit: 'R$ 1.897,00',
     priceCredit: '12x de R$ 158,08',
-    paymentNote: officialDisclaimer
+    paymentNote: officialDisclaimer,
+    hasNFC: true
   },
   {
     id: 'c63',
@@ -150,7 +156,8 @@ export const productsData: Product[] = [
     ],
     priceDebit: 'R$ 1.899,90',
     priceCredit: '12x de R$ 158,33',
-    paymentNote: officialDisclaimer
+    paymentNote: officialDisclaimer,
+    hasNFC: true
   },
   {
     id: 'c100i',
@@ -169,7 +176,8 @@ export const productsData: Product[] = [
     ],
     priceDebit: 'R$ 2.247,00',
     priceCredit: '12x de R$ 187,25',
-    paymentNote: officialDisclaimer
+    paymentNote: officialDisclaimer,
+    hasNFC: false
   },
   {
     id: 'c85',
@@ -188,7 +196,8 @@ export const productsData: Product[] = [
     ],
     priceDebit: 'R$ 2.499,00',
     priceCredit: '12x de R$ 208,25',
-    paymentNote: officialDisclaimer
+    paymentNote: officialDisclaimer,
+    hasNFC: true
   },
 
   // =========================
@@ -211,7 +220,8 @@ export const productsData: Product[] = [
     ],
     priceDebit: 'R$ 2.799,90',
     priceCredit: '12x de R$ 233,32',
-    paymentNote: officialDisclaimer
+    paymentNote: officialDisclaimer,
+    hasNFC: true
   },
   {
     id: '14',
@@ -231,7 +241,8 @@ export const productsData: Product[] = [
     ],
     priceDebit: 'R$ 2.949,90',
     priceCredit: '12x de R$ 245,82',
-    paymentNote: officialDisclaimer
+    paymentNote: officialDisclaimer,
+    hasNFC: true
   },
   {
     id: '14propl',
@@ -250,7 +261,8 @@ export const productsData: Product[] = [
     ],
     priceDebit: 'R$ 4.199,90',
     priceCredit: '12x de R$ 349,99',
-    paymentNote: officialDisclaimer
+    paymentNote: officialDisclaimer,
+    hasNFC: true
   },
   {
     id: '12propl',
@@ -269,6 +281,7 @@ export const productsData: Product[] = [
     ],
     priceDebit: 'R$ 3.599,90',
     priceCredit: '12x de R$ 299,99',
-    paymentNote: officialDisclaimer
+    paymentNote: officialDisclaimer,
+    hasNFC: true
   },
 ];
