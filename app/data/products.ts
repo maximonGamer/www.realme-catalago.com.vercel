@@ -259,8 +259,8 @@ export const productsData: Product[] = [
       { name: 'Branco Pérola', hex: '#f0eee6', imageUrl: '/images/14pro-white.webp' },
       { name: 'Cinza Emborrachado', hex: '#808080', imageUrl: '/images/14pro-gray.webp' },
     ],
-    priceDebit: 'R$ 4.199,90',
-    priceCredit: '12x de R$ 349,99',
+    priceDebit: 'R$ 4.399,90',
+    priceCredit: '12x de R$ 366,65',
     paymentNote: officialDisclaimer,
     hasNFC: true
   },
