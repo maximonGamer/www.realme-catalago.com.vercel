@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-// Adicionado o "Color" na importação para evitar erros no TypeScript
 import { productsData, seriesOrder, Product, Spec, Color } from './data/products';
 
 export default function Catalogo() {
@@ -11,26 +10,36 @@ export default function Catalogo() {
   const [showSplash, setShowSplash] = useState(true);
   const [isMuted, setIsMuted] = useState(false);
   const [selectedInterest, setSelectedInterest] = useState<{ product: Product, colorName: string } | null>(null);
-  const [toastMessage, setToastMessage] = useState<string | null>(null); // Estado da Notificação Premium
-  const audioRef = useRef<HTMLAudioElement>(null);
+  const [showDuvidasModal, setShowDuvidasModal] = useState(false); // Estado para o modal de Dúvidas
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  
+  const backgroundAudioRef = useRef<HTMLAudioElement>(null);
+  const voiceAudioRef = useRef<HTMLAudioElement>(null);
+  const duvidasAudioRef = useRef<HTMLAudioElement>(null); // Áudio explicativo da Realme
 
   // Controle inteligente de Autoplay
   useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
+    const bgAudio = backgroundAudioRef.current;
+    const voiceAudio = voiceAudioRef.current;
 
-    audio.volume = 0.2;
+    if (bgAudio) bgAudio.volume = 0.2; 
+    if (voiceAudio) voiceAudio.volume = 1.0; 
 
-    const tentarTocarSom = async () => {
+    const tentarTocarSons = async () => {
       try {
-        await audio.play();
+        if (voiceAudio) {
+          await voiceAudio.play();
+        }
+        if (bgAudio) {
+          await bgAudio.play();
+        }
         removerGanchosDeInteracao();
       } catch (err) {
-        console.log("Autoplay bloqueado. Aguardando interação...");
+        console.log("Autoplay bloqueado pelo navegador. Aguardando interação...");
       }
     };
 
-    const interacaoUsuario = () => tentarTocarSom();
+    const interacaoUsuario = () => tentarTocarSons();
 
     const adicionarGanchosDeInteracao = () => {
       window.addEventListener('click', interacaoUsuario);
@@ -42,10 +51,12 @@ export default function Catalogo() {
       window.removeEventListener('touchstart', interacaoUsuario);
     };
 
-    tentarTocarSom();
+    tentarTocarSons();
     adicionarGanchosDeInteracao();
 
-    const timer = setTimeout(() => { setShowSplash(false); }, 4000);
+    const timer = setTimeout(() => { 
+      setShowSplash(false); 
+    }, 4500);
 
     return () => {
       clearTimeout(timer);
@@ -54,18 +65,37 @@ export default function Catalogo() {
   }, []);
 
   const toggleMute = () => {
-    if (audioRef.current) {
-      audioRef.current.muted = !isMuted;
-      setIsMuted(!isMuted);
+    if (backgroundAudioRef.current && voiceAudioRef.current) {
+      const novoEstadoMudo = !isMuted;
+      backgroundAudioRef.current.muted = novoEstadoMudo;
+      voiceAudioRef.current.muted = novoEstadoMudo;
+      setIsMuted(novoEstadoMudo);
+    }
+  };
+
+  // Função para abrir Dúvidas e pausar a música de fundo momentaneamente para escutar o áudio explicativo
+  const handleOpenDuvidas = () => {
+    setShowDuvidasModal(true);
+    if (backgroundAudioRef.current) {
+      backgroundAudioRef.current.volume = 0.05; // Abaixa bem a música de fundo
+    }
+  };
+
+  const handleCloseDuvidas = () => {
+    setShowDuvidasModal(false);
+    if (duvidasAudioRef.current) {
+      duvidasAudioRef.current.pause();
+      duvidasAudioRef.current.currentTime = 0;
+    }
+    if (backgroundAudioRef.current) {
+      backgroundAudioRef.current.volume = 0.2; // Retorna o volume normal
     }
   };
 
   const filteredProducts = activeSeries === "Todos" 
     ? productsData 
-    // Tipagem adicionada: (p: Product)
     : productsData.filter((p: Product) => p.series === activeSeries);
 
-  // Função de Cópia com Notificação Premium MANTIDA DA ORIGINAL
   const handleCopyAndClose = async () => {
     if (!selectedInterest) return;
     
@@ -74,11 +104,8 @@ export default function Catalogo() {
     
     try {
       await navigator.clipboard.writeText(textoMensagem);
-      
-      // Aciona o aviso bonito no topo da tela
       setToastMessage("Mensagem copiada com sucesso! Cole no chat.");
-      setTimeout(() => setToastMessage(null), 4000); // Some após 4s
-      
+      setTimeout(() => setToastMessage(null), 4000);
     } catch (err) {
       console.log("Não foi possível copiar automaticamente.");
     }
@@ -88,9 +115,12 @@ export default function Catalogo() {
 
   return (
     <div className="min-h-screen bg-[#F6F5F1] text-[#101012] font-sans selection:bg-[#FFDE00] selection:text-black">
-      <audio ref={audioRef} src="/audio/background.mp3" loop />
+      <audio ref={backgroundAudioRef} src="/audio/background.mp3" loop />
+      <audio ref={voiceAudioRef} src="/audio/voice-intro.mp3" />
+      {/* Áudio explicativo sobre a Realme (Salve o arquivo como duvidas-realme.mp3 na pasta public/audio/) */}
+      <audio ref={duvidasAudioRef} src="/audio/duvidas-realme.mp3" />
 
-      {/* TOAST NOTIFICATION (Substituto do alert) */}
+      {/* TOAST NOTIFICATION */}
       <AnimatePresence>
         {toastMessage && (
           <motion.div 
@@ -109,7 +139,73 @@ export default function Catalogo() {
         )}
       </AnimatePresence>
 
-      {/* MODAL DE INTERESSE (Premium) */}
+      {/* MODAL DE DÚVIDAS / SOBRE A REALME */}
+      <AnimatePresence>
+        {showDuvidasModal && (
+          <motion.div 
+            className="fixed inset-0 z-[250] bg-black/70 backdrop-blur-md flex items-center justify-center p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div 
+              className="bg-white rounded-3xl p-8 max-w-lg w-full shadow-2xl relative overflow-hidden text-center"
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+            >
+              <div className="absolute top-0 left-0 right-0 h-2 bg-[#FFDE00]" />
+              
+              <button 
+                onClick={handleCloseDuvidas}
+                className="absolute top-4 right-4 text-gray-400 hover:text-black transition-colors bg-gray-50 hover:bg-gray-100 p-2 rounded-full"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+              </button>
+
+              <span className="inline-block bg-[#FFDE00]/20 text-black text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full mb-3">
+                Central de Dúvidas
+              </span>
+
+              <h2 className="text-3xl font-black tracking-tight mb-2 text-[#101012]">
+                Por dentro da <span className="text-[#FFDE00] bg-black px-2 py-0.5 rounded">realme</span>
+              </h2>
+
+              <p className="text-xs text-gray-600 mb-6 leading-relaxed">
+                Ouça a nossa explicação em áudio sobre a história, tecnologia e inovação da marca que mais cresce no mundo!
+              </p>
+
+              {/* Player de Áudio Customizado para Dúvidas */}
+              <div className="bg-gray-50 border border-gray-100 p-6 rounded-2xl mb-6 shadow-inner flex flex-col items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-[#101012] text-[#FFDE00] flex items-center justify-center shadow-lg animate-pulse">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                  </svg>
+                </div>
+
+                <div className="w-full space-y-2">
+                  <p className="text-xs font-bold uppercase tracking-wider text-gray-500">Reproduzir Explicação Oficial</p>
+                  <audio 
+                    ref={duvidasAudioRef} 
+                    src="/audio/duvidas-realme.mp3" 
+                    controls 
+                    className="w-full accent-[#101012]"
+                  />
+                </div>
+              </div>
+
+              <button 
+                onClick={handleCloseDuvidas}
+                className="w-full bg-[#101012] text-white py-4 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-[#FFDE00] hover:text-black active:scale-[0.98] transition-all"
+              >
+                Entendido, voltar ao catálogo
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* MODAL DE INTERESSE */}
       <AnimatePresence>
         {selectedInterest && (
           <motion.div 
@@ -169,62 +265,82 @@ export default function Catalogo() {
         )}
       </AnimatePresence>
 
-      {/* SPLASH SCREEN */}
+      {/* SPLASH SCREEN PREMIUM */}
       <AnimatePresence>
         {showSplash && (
           <motion.div 
-            className="fixed inset-0 z-[100] bg-[#101012] flex flex-col items-center justify-center text-center p-6"
-            exit={{ opacity: 0, scale: 1.05 }}
+            className="fixed inset-0 z-[100] bg-[#101012] flex flex-col items-center justify-center text-center p-6 overflow-hidden"
+            exit={{ opacity: 0, filter: "blur(10px)", scale: 1.05 }}
             transition={{ duration: 0.8, ease: "easeInOut" }}
           >
-            <div className="space-y-8 max-w-lg">
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#FFDE00]/5 rounded-full blur-[100px] pointer-events-none" />
+
+            <div className="space-y-8 max-w-lg relative z-10">
               <motion.h1 
-                initial={{ opacity: 0, y: -10 }}
+                initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-                className="text-5xl font-mono font-bold text-white tracking-tighter"
+                transition={{ duration: 0.8, ease: "easeOut" }}
+                className="text-6xl font-mono font-black text-white tracking-tighter drop-shadow-xl"
               >
                 real<span className="text-[#FFDE00]">me</span>
               </motion.h1>
 
+              <motion.div className="space-y-5">
+                <motion.p 
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.6, duration: 0.8 }}
+                  className="text-white/90 text-xl font-light tracking-wide leading-relaxed"
+                >
+                  Seja bem vindo ao nosso mundo.
+                </motion.p>
+                <motion.p 
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 1.4, duration: 0.8 }}
+                  className="text-[#FFDE00] text-xs font-bold tracking-[0.25em] uppercase"
+                >
+                  Por que não olhar nossos modelos?
+                </motion.p>
+              </motion.div>
+
               <motion.div 
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 0.4, duration: 0.8 }}
-                className="space-y-3"
+                transition={{ delay: 2, duration: 0.8 }}
+                className="w-48 h-[2px] bg-white/10 mx-auto rounded-full overflow-hidden relative mt-8"
               >
-                <p className="text-white text-lg font-light tracking-wider leading-relaxed">
-                  Seja bem-vindo ao catálogo realme.
-                </p>
-                <p className="text-[#FFDE00] text-xs font-bold tracking-[0.25em] uppercase">
-                  Fique à vontade para ver o nosso catálogo.
-                </p>
-              </motion.div>
-
-              <div className="w-40 h-[2px] bg-white/10 mx-auto rounded-full overflow-hidden relative">
                 <motion.div 
                   initial={{ left: "-100%" }}
                   animate={{ left: "100%" }}
-                  transition={{ repeat: Infinity, duration: 1.8, ease: "easeInOut" }}
-                  className="absolute top-0 bottom-0 w-1/2 bg-[#FFDE00] rounded-full shadow-[0_0_8px_#FFDE00]"
+                  transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+                  className="absolute top-0 bottom-0 w-1/2 bg-gradient-to-r from-transparent via-[#FFDE00] to-transparent rounded-full shadow-[0_0_12px_#FFDE00]"
                 />
-              </div>
+              </motion.div>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* HEADER */}
+      {/* HEADER COM O NOVO BOTÃO DE DÚVIDAS */}
       <header className="sticky top-0 z-50 bg-[#101012]/95 backdrop-blur-md border-b border-[#FFDE00]/25 shadow-md">
         <div className="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
           <div className="text-2xl font-bold text-white font-mono tracking-tighter">
             real<span className="text-[#FFDE00]">me</span>
           </div>
           
-          <div className="flex items-center gap-6">
-            <span className="hidden sm:inline-block text-[10px] text-white/50 tracking-[0.2em] uppercase font-bold font-mono">
-              Catálogo Oficial
-            </span>
+          <div className="flex items-center gap-3 sm:gap-6">
+            {/* Botão de Dúvidas / Sobre a Realme */}
+            <button 
+              onClick={handleOpenDuvidas}
+              className="flex items-center gap-1.5 text-black bg-[#FFDE00] hover:bg-[#e6c800] text-xs font-black uppercase tracking-wider px-4 py-2 rounded-full shadow-md transition-all active:scale-95"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>Dúvidas</span>
+            </button>
+
             <button 
               onClick={toggleMute} 
               className="flex items-center gap-2 text-[#FFDE00] text-xs font-bold uppercase tracking-widest hover:opacity-80 transition-all bg-white/5 px-4 py-2 rounded-full border border-white/10"
@@ -255,7 +371,6 @@ export default function Catalogo() {
 
         {/* FILTROS */}
         <div className="flex gap-3 mb-12 overflow-x-auto pb-3 scrollbar-hide">
-          {/* Tipagem adicionada: (s: string) */}
           {seriesOrder.map((s: string) => (
             <button 
               key={s} 
@@ -274,7 +389,6 @@ export default function Catalogo() {
         {/* GRID DE PRODUTOS */}
         <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pb-24">
           <AnimatePresence>
-            {/* Tipagem adicionada: (p: Product) */}
             {filteredProducts.map((p: Product) => (
               <ProductCard 
                 key={p.id} 
@@ -295,7 +409,7 @@ export default function Catalogo() {
   );
 }
 
-// COMPONENTE CARD (Sua Estrutura Original + INDICADOR NFC)
+// COMPONENTE CARD
 function ProductCard({ product, onInterest }: { product: Product, onInterest: (p: Product, color: string) => void }) {
   const [colorIndex, setColorIndex] = useState(0);
   const activeColor = product.colors[colorIndex];
@@ -310,13 +424,11 @@ function ProductCard({ product, onInterest }: { product: Product, onInterest: (p
       className="group bg-white rounded-3xl p-6 border border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-500 flex flex-col justify-between"
     >
       <div>
-        {/* Tag Categoria e NFC */}
         <div className="flex justify-between items-center mb-4">
           <span className="text-[9px] font-bold tracking-widest uppercase bg-gray-50 text-gray-500 px-3 py-1.5 rounded-full border border-gray-100">
             {product.series}
           </span>
           
-          {/* LÓGICA DO NFC AQUI: Verde se tiver, Cinza se não tiver */}
           {product.hasNFC ? (
             <span className="text-[8px] font-black tracking-wider uppercase bg-[#00C2A8]/10 text-[#00C2A8] px-2.5 py-1 rounded-md flex items-center gap-1">
               <span className="h-1.5 w-1.5 rounded-full bg-[#00C2A8]"></span>
@@ -329,27 +441,24 @@ function ProductCard({ product, onInterest }: { product: Product, onInterest: (p
           )}
         </div>
 
-        {/* Imagem do Produto com Efeito Float */}
         <div className="relative h-64 w-full mb-6 overflow-hidden flex items-center justify-center">
           <Image 
             src={activeColor.imageUrl} 
             alt={product.name} 
             fill 
+            priority
             sizes="(max-width: 768px) 100vw, 33vw"
             className="object-contain transform group-hover:scale-105 group-hover:-translate-y-2 transition-all duration-500 ease-out drop-shadow-md" 
           />
         </div>
 
-        {/* Info Básica */}
         <h3 className="text-xl font-bold tracking-tight mb-1 text-black">{product.name}</h3>
         <p className="text-[12px] text-gray-500 leading-relaxed mb-6 h-10">{product.highlight}</p>
       </div>
 
       <div className="space-y-5">
-        {/* Seletor de Cores */}
         <div className="flex items-center justify-between">
           <div className="flex gap-2">
-            {/* Tipagem adicionada: (c: Color, i: number) */}
             {product.colors.map((c: Color, i: number) => (
               <button 
                 key={c.name} 
@@ -367,7 +476,6 @@ function ProductCard({ product, onInterest }: { product: Product, onInterest: (p
           </span>
         </div>
 
-        {/* ESPECIFICAÇÕES TÉCNICAS (Nas caixinhas cinzas) */}
         <div className="grid grid-cols-2 gap-2.5">
           {product.specs.slice(0, 4).map((s: Spec, i: number) => (
             <div key={i} className="bg-[#F9F9F9] p-3 rounded-xl border border-gray-100 group-hover:border-gray-200 transition-colors">
@@ -381,7 +489,6 @@ function ProductCard({ product, onInterest }: { product: Product, onInterest: (p
           ))}
         </div>
 
-        {/* ÁREA DE PREÇOS E NOTA LEGAL (Original) */}
         <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 shadow-inner">
           <div className="flex justify-between items-end mb-2">
             <span className="text-[10px] uppercase font-bold text-gray-500 tracking-wider">Débito/Pix:</span>
@@ -398,7 +505,6 @@ function ProductCard({ product, onInterest }: { product: Product, onInterest: (p
           </div>
         </div>
 
-        {/* Botão de Ação */}
         <button 
           onClick={() => onInterest(product, activeColor.name)} 
           className="w-full bg-[#101012] text-white hover:bg-black py-4 rounded-2xl font-bold text-xs uppercase tracking-widest active:scale-[0.98] hover:shadow-lg transition-all duration-300"
