@@ -10,12 +10,15 @@ export default function Catalogo() {
   const [showSplash, setShowSplash] = useState(true);
   const [isMuted, setIsMuted] = useState(false);
   const [selectedInterest, setSelectedInterest] = useState<{ product: Product, colorName: string } | null>(null);
-  const [showDuvidasModal, setShowDuvidasModal] = useState(false); // Estado para o modal de Dúvidas
+  const [showDuvidasModal, setShowDuvidasModal] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [activeAudioTab, setActiveAudioTab] = useState<'marca' | 'manaus' | 'pitzi'>('marca'); // Adicionado aba Pitzi
   
   const backgroundAudioRef = useRef<HTMLAudioElement>(null);
   const voiceAudioRef = useRef<HTMLAudioElement>(null);
-  const duvidasAudioRef = useRef<HTMLAudioElement>(null); // Áudio explicativo da Realme
+  const duvidasAudioRef = useRef<HTMLAudioElement>(null);
+  const manausAudioRef = useRef<HTMLAudioElement>(null);
+  const pitziAudioRef = useRef<HTMLAudioElement>(null); // Referência para o áudio de proteção Pitzi
 
   // Controle inteligente de Autoplay
   useEffect(() => {
@@ -27,12 +30,8 @@ export default function Catalogo() {
 
     const tentarTocarSons = async () => {
       try {
-        if (voiceAudio) {
-          await voiceAudio.play();
-        }
-        if (bgAudio) {
-          await bgAudio.play();
-        }
+        if (voiceAudio) await voiceAudio.play();
+        if (bgAudio) await bgAudio.play();
         removerGanchosDeInteracao();
       } catch (err) {
         console.log("Autoplay bloqueado pelo navegador. Aguardando interação...");
@@ -73,11 +72,10 @@ export default function Catalogo() {
     }
   };
 
-  // Função para abrir Dúvidas e pausar a música de fundo momentaneamente para escutar o áudio explicativo
   const handleOpenDuvidas = () => {
     setShowDuvidasModal(true);
     if (backgroundAudioRef.current) {
-      backgroundAudioRef.current.volume = 0.05; // Abaixa bem a música de fundo
+      backgroundAudioRef.current.volume = 0.05;
     }
   };
 
@@ -87,8 +85,16 @@ export default function Catalogo() {
       duvidasAudioRef.current.pause();
       duvidasAudioRef.current.currentTime = 0;
     }
+    if (manausAudioRef.current) {
+      manausAudioRef.current.pause();
+      manausAudioRef.current.currentTime = 0;
+    }
+    if (pitziAudioRef.current) {
+      pitziAudioRef.current.pause();
+      pitziAudioRef.current.currentTime = 0;
+    }
     if (backgroundAudioRef.current) {
-      backgroundAudioRef.current.volume = 0.2; // Retorna o volume normal
+      backgroundAudioRef.current.volume = 0.2;
     }
   };
 
@@ -113,12 +119,39 @@ export default function Catalogo() {
     setSelectedInterest(null);
   };
 
+  // Cores de Oceano com padrão Premium no fundo
+  const getOceanThemeBackground = () => {
+    switch (activeSeries) {
+      case 'Linha Note':
+        return 'bg-gradient-to-br from-[#0B192C] via-[#1E3E62] to-[#001F3F]';
+      case 'Linha C':
+        return 'bg-gradient-to-br from-[#120B24] via-[#2A1B4E] to-[#0F081E]';
+      case 'Linha Number':
+        return 'bg-gradient-to-br from-[#1C1204] via-[#38220A] to-[#120B02]';
+      case 'Linha P4':
+        return 'bg-gradient-to-br from-[#031710] via-[#0B3825] to-[#020D09]';
+      case 'Acessórios':
+        return 'bg-gradient-to-br from-[#1D0914] via-[#3D152C] to-[#12050C]';
+      default:
+        return 'bg-gradient-to-br from-[#0A1128] via-[#1C2D42] to-[#050814]';
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-[#F6F5F1] text-[#101012] font-sans selection:bg-[#FFDE00] selection:text-black">
+    <div className={`min-h-screen ${getOceanThemeBackground()} text-[#101012] font-sans selection:bg-[#FFDE00] selection:text-black transition-all duration-700 relative overflow-hidden`}>
+      
+      {/* EFEITO DE LUZES DE FUNDO */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden z-0 opacity-30">
+        <div className="absolute -top-40 -left-40 w-[500px] h-[500px] bg-[#FFDE00]/15 rounded-full blur-[140px]" />
+        <div className="absolute top-1/2 -right-40 w-[600px] h-[600px] bg-[#00C2A8]/15 rounded-full blur-[150px]" />
+        <div className="absolute bottom-0 left-1/3 w-[500px] h-[500px] bg-[#3A86EF]/15 rounded-full blur-[140px]" />
+      </div>
+
       <audio ref={backgroundAudioRef} src="/audio/background.mp3" loop />
       <audio ref={voiceAudioRef} src="/audio/voice-intro.mp3" />
-      {/* Áudio explicativo sobre a Realme (Salve o arquivo como duvidas-realme.mp3 na pasta public/audio/) */}
       <audio ref={duvidasAudioRef} src="/audio/duvidas-realme.mp3" />
+      <audio ref={manausAudioRef} src="/audio/fabrica-manaus.mp3" />
+      <audio ref={pitziAudioRef} src="/audio/protecao-pitzi.mp3" /> {/* Arquivo de áudio de proteção Pitzi */}
 
       {/* TOAST NOTIFICATION */}
       <AnimatePresence>
@@ -139,7 +172,7 @@ export default function Catalogo() {
         )}
       </AnimatePresence>
 
-      {/* MODAL DE DÚVIDAS / SOBRE A REALME */}
+      {/* MODAL DE DÚVIDAS COM ABAS DE ÁUDIO (MARCA, MANAUS E PITZI) */}
       <AnimatePresence>
         {showDuvidasModal && (
           <motion.div 
@@ -164,39 +197,107 @@ export default function Catalogo() {
               </button>
 
               <span className="inline-block bg-[#FFDE00]/20 text-black text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full mb-3">
-                Central de Dúvidas
+                Central de Dúvidas & Benefícios
               </span>
 
-              <h2 className="text-3xl font-black tracking-tight mb-2 text-[#101012]">
-                Por dentro da <span className="text-[#FFDE00] bg-black px-2 py-0.5 rounded">realme</span>
+              <h2 className="text-2xl font-black tracking-tight mb-4 text-[#101012]">
+                Tudo sobre a <span className="text-[#FFDE00] bg-black px-2 py-0.5 rounded">realme</span>
               </h2>
 
-              <p className="text-xs text-gray-600 mb-6 leading-relaxed">
-                Ouça a nossa explicação em áudio sobre a história, tecnologia e inovação da marca que mais cresce no mundo!
-              </p>
-
-              {/* Player de Áudio Customizado para Dúvidas */}
-              <div className="bg-gray-50 border border-gray-100 p-6 rounded-2xl mb-6 shadow-inner flex flex-col items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-[#101012] text-[#FFDE00] flex items-center justify-center shadow-lg animate-pulse">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-                  </svg>
-                </div>
-
-                <div className="w-full space-y-2">
-                  <p className="text-xs font-bold uppercase tracking-wider text-gray-500">Reproduzir Explicação Oficial</p>
-                  <audio 
-                    ref={duvidasAudioRef} 
-                    src="/audio/duvidas-realme.mp3" 
-                    controls 
-                    className="w-full accent-[#101012]"
-                  />
-                </div>
+              {/* Botões de Seleção de Áudio (Abas com Proteção Pitzi inclusa) */}
+              <div className="grid grid-cols-3 gap-1.5 mb-6 bg-gray-100 p-1.5 rounded-2xl">
+                <button
+                  onClick={() => {
+                    setActiveAudioTab('marca');
+                    if (manausAudioRef.current) { manausAudioRef.current.pause(); manausAudioRef.current.currentTime = 0; }
+                    if (pitziAudioRef.current) { pitziAudioRef.current.pause(); pitziAudioRef.current.currentTime = 0; }
+                  }}
+                  className={`py-2 px-1 rounded-xl text-[11px] font-bold transition-all ${
+                    activeAudioTab === 'marca' 
+                      ? 'bg-black text-[#FFDE00] shadow-md' 
+                      : 'text-gray-600 hover:text-black'
+                  }`}
+                >
+                  🌐 Marca
+                </button>
+                <button
+                  onClick={() => {
+                    setActiveAudioTab('manaus');
+                    if (duvidasAudioRef.current) { duvidasAudioRef.current.pause(); duvidasAudioRef.current.currentTime = 0; }
+                    if (pitziAudioRef.current) { pitziAudioRef.current.pause(); pitziAudioRef.current.currentTime = 0; }
+                  }}
+                  className={`py-2 px-1 rounded-xl text-[11px] font-bold transition-all ${
+                    activeAudioTab === 'manaus' 
+                      ? 'bg-black text-[#FFDE00] shadow-md' 
+                      : 'text-gray-600 hover:text-black'
+                  }`}
+                >
+                  🏭 Manaus
+                </button>
+                <button
+                  onClick={() => {
+                    setActiveAudioTab('pitzi');
+                    if (duvidasAudioRef.current) { duvidasAudioRef.current.pause(); duvidasAudioRef.current.currentTime = 0; }
+                    if (manausAudioRef.current) { manausAudioRef.current.pause(); manausAudioRef.current.currentTime = 0; }
+                  }}
+                  className={`py-2 px-1 rounded-xl text-[11px] font-bold transition-all ${
+                    activeAudioTab === 'pitzi' 
+                      ? 'bg-black text-[#FFDE00] shadow-md' 
+                      : 'text-gray-600 hover:text-black'
+                  }`}
+                >
+                  🛡️ Proteção Pitzi
+                </button>
               </div>
+
+              {/* Conteúdo da Aba 1: Crescimento Global */}
+              {activeAudioTab === 'marca' && (
+                <div className="space-y-4 animate-fadeIn">
+                  <p className="text-xs text-gray-600 leading-relaxed">
+                    Ouça a explicação sobre a trajetória da marca que mais cresce no mundo e sua tecnologia inovadora.
+                  </p>
+                  <div className="bg-gray-50 border border-gray-100 p-5 rounded-2xl shadow-inner flex flex-col items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-[#101012] text-[#FFDE00] flex items-center justify-center shadow-md animate-pulse">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
+                    </div>
+                    <audio ref={duvidasAudioRef} src="/audio/duvidas-realme.mp3" controls className="w-full accent-[#101012]" />
+                  </div>
+                </div>
+              )}
+
+              {/* Conteúdo da Aba 2: Fábrica em Manaus */}
+              {activeAudioTab === 'manaus' && (
+                <div className="space-y-4 animate-fadeIn">
+                  <p className="text-xs text-gray-600 leading-relaxed">
+                    Saiba mais sobre a nossa linha de montagem e fabricação nacional com padrão de qualidade internacional.
+                  </p>
+                  <div className="bg-gray-50 border border-gray-100 p-5 rounded-2xl shadow-inner flex flex-col items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-[#101012] text-[#FFDE00] flex items-center justify-center shadow-md animate-pulse">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+                    </div>
+                    <audio ref={manausAudioRef} src="/audio/fabrica-manaus.mp3" controls className="w-full accent-[#101012]" />
+                  </div>
+                </div>
+              )}
+
+              {/* Conteúdo da Aba 3: Proteção Realme (Pitzi) */}
+              {activeAudioTab === 'pitzi' && (
+                <div className="space-y-4 animate-fadeIn">
+                  <p className="text-xs text-gray-600 leading-relaxed">
+                    Proteja o seu investimento! Em parceria oficial com a <strong>Pitzi</strong>, oferecemos planos de cobertura contra roubo, furto qualificado e danos acidentais (como tela quebrada).
+                  </p>
+                  <div className="bg-gray-50 border border-gray-100 p-5 rounded-2xl shadow-inner flex flex-col items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-[#00C2A8] text-white flex items-center justify-center shadow-md animate-pulse">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                    </div>
+                    <audio ref={pitziAudioRef} src="/audio/protecao-pitzi.mp3" controls className="w-full accent-[#101012]" />
+                  </div>
+                </div>
+              )}
 
               <button 
                 onClick={handleCloseDuvidas}
-                className="w-full bg-[#101012] text-white py-4 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-[#FFDE00] hover:text-black active:scale-[0.98] transition-all"
+                className="w-full mt-6 bg-[#101012] text-white py-4 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-[#FFDE00] hover:text-black active:scale-[0.98] transition-all"
               >
                 Entendido, voltar ao catálogo
               </button>
@@ -322,7 +423,7 @@ export default function Catalogo() {
         )}
       </AnimatePresence>
 
-      {/* HEADER COM O NOVO BOTÃO DE DÚVIDAS */}
+      {/* HEADER */}
       <header className="sticky top-0 z-50 bg-[#101012]/95 backdrop-blur-md border-b border-[#FFDE00]/25 shadow-md">
         <div className="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
           <div className="text-2xl font-bold text-white font-mono tracking-tighter">
@@ -330,7 +431,6 @@ export default function Catalogo() {
           </div>
           
           <div className="flex items-center gap-3 sm:gap-6">
-            {/* Botão de Dúvidas / Sobre a Realme */}
             <button 
               onClick={handleOpenDuvidas}
               className="flex items-center gap-1.5 text-black bg-[#FFDE00] hover:bg-[#e6c800] text-xs font-black uppercase tracking-wider px-4 py-2 rounded-full shadow-md transition-all active:scale-95"
@@ -358,15 +458,15 @@ export default function Catalogo() {
       </header>
 
       {/* MAIN */}
-      <main className="max-w-6xl mx-auto px-6 py-12">
+      <main className="max-w-6xl mx-auto px-6 py-12 relative z-10">
         <div className="mb-12">
-          <span className="inline-block text-[10px] font-bold tracking-[0.2em] uppercase bg-[#00C2A8]/10 text-[#00C2A8] px-3 py-1 rounded-sm mb-3">
+          <span className="inline-block text-[10px] font-bold tracking-[0.2em] uppercase bg-[#00C2A8]/20 text-[#00C2A8] border border-[#00C2A8]/30 px-3 py-1 rounded-full mb-3">
             dare to leap
           </span>
-          <h1 className="text-4xl font-black tracking-tight mb-2 text-[#101012]">
+          <h1 className="text-4xl font-black tracking-tight mb-2 text-white">
             Navegue pela nossa seleção.
           </h1>
-          <p className="text-sm text-gray-500">Toque nas cores para alterar a imagem e escolha o seu modelo favorito.</p>
+          <p className="text-sm text-gray-300">Toque nas cores para alterar a imagem e escolha o seu modelo favorito.</p>
         </div>
 
         {/* FILTROS */}
@@ -378,7 +478,7 @@ export default function Catalogo() {
               className={`px-6 py-2.5 rounded-full text-xs font-bold transition-all duration-300 ${
                 s === activeSeries 
                   ? 'bg-[#FFDE00] text-black shadow-lg border-transparent scale-105' 
-                  : 'bg-white text-[#101012] border border-black/5 hover:border-black/20 hover:bg-gray-50'
+                  : 'bg-white/10 backdrop-blur-sm text-white border border-white/10 hover:border-white/30 hover:bg-white/20'
               }`}
             >
               {s}
@@ -401,15 +501,15 @@ export default function Catalogo() {
       </main>
 
       {/* FOOTER */}
-      <footer className="border-t border-black/5 py-8 bg-[#101012] text-white/40 text-[10px] font-mono text-center">
-        <p className="tracking-widest uppercase mb-1">realme Catálogo Oficial</p>
-        <p className="mt-2 text-white/20">Desenvolvido por Technology Vision</p>
+      <footer className="border-t border-white/10 py-8 bg-[#050814]/90 text-white/40 text-[10px] font-mono text-center relative z-10">
+        <p className="tracking-widest uppercase mb-1 text-white/60">realme Catálogo Oficial</p>
+        <p className="mt-2 text-white/30">Desenvolvido por Technology Vision</p>
       </footer>
     </div>
   );
 }
 
-// COMPONENTE CARD
+// COMPONENTE CARD BRANCO CLÁSSICO
 function ProductCard({ product, onInterest }: { product: Product, onInterest: (p: Product, color: string) => void }) {
   const [colorIndex, setColorIndex] = useState(0);
   const activeColor = product.colors[colorIndex];
@@ -421,16 +521,16 @@ function ProductCard({ product, onInterest }: { product: Product, onInterest: (p
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
       transition={{ duration: 0.4 }}
-      className="group bg-white rounded-3xl p-6 border border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-500 flex flex-col justify-between"
+      className="group bg-white text-[#101012] rounded-3xl p-6 border border-gray-100 shadow-[0_10px_30px_rgba(0,0,0,0.2)] hover:shadow-[0_20px_40px_rgba(255,222,0,0.2)] hover:-translate-y-1 transition-all duration-500 flex flex-col justify-between"
     >
       <div>
         <div className="flex justify-between items-center mb-4">
-          <span className="text-[9px] font-bold tracking-widest uppercase bg-gray-50 text-gray-500 px-3 py-1.5 rounded-full border border-gray-100">
+          <span className="text-[9px] font-bold tracking-widest uppercase bg-gray-100 text-gray-600 px-3 py-1.5 rounded-full border border-gray-200">
             {product.series}
           </span>
           
           {product.hasNFC ? (
-            <span className="text-[8px] font-black tracking-wider uppercase bg-[#00C2A8]/10 text-[#00C2A8] px-2.5 py-1 rounded-md flex items-center gap-1">
+            <span className="text-[8px] font-black tracking-wider uppercase bg-[#00C2A8]/10 text-[#00C2A8] px-2.5 py-1 rounded-md flex items-center gap-1 border border-[#00C2A8]/20">
               <span className="h-1.5 w-1.5 rounded-full bg-[#00C2A8]"></span>
               Possui NFC
             </span>
@@ -464,14 +564,14 @@ function ProductCard({ product, onInterest }: { product: Product, onInterest: (p
                 key={c.name} 
                 onClick={() => setColorIndex(i)} 
                 className={`w-6 h-6 rounded-full border-[3px] transition-all duration-300 ${
-                  colorIndex === i ? 'border-gray-200 scale-110 shadow-sm' : 'border-transparent hover:scale-105'
+                  colorIndex === i ? 'border-gray-300 scale-110 shadow-sm' : 'border-transparent hover:scale-105'
                 }`} 
                 style={{ backgroundColor: c.hex }} 
                 title={c.name}
               />
             ))}
           </div>
-          <span className="text-[10px] font-mono font-bold tracking-widest text-black/40 uppercase bg-gray-50 px-2 py-1 rounded">
+          <span className="text-[10px] font-mono font-bold tracking-widest text-black/50 uppercase bg-gray-100 px-2.5 py-1 rounded-md border border-gray-200">
             {activeColor.name}
           </span>
         </div>

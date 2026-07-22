@@ -110,7 +110,7 @@ export const productsData: Product[] = [
       { label: 'Processador', value: 'MediaTek Helio G85' },
       { label: 'Tela', value: '6.72” 90Hz FHD+' },
       { label: 'Memória', value: '8GB RAM | 256GB ROM' },
-      { label: 'Bateria', value: '5828mAh + 33W' },
+      { label: 'Bateria', value: '5828mAh + 45W' },
     ],
     colors: [
       { name: 'Dourado Cintilante', hex: '#d8c08a', imageUrl: '/images/c75-gold.webp' },
@@ -130,7 +130,7 @@ export const productsData: Product[] = [
       { label: 'Processador', value: 'Unisoc T612 Octa-Core' },
       { label: 'Tela', value: '6.74” 90Hz HD+' },
       { label: 'Memória', value: '8GB RAM | 256GB ROM' },
-      { label: 'Bateria', value: '6000mAh + 33W' },
+      { label: 'Bateria', value: '6000mAh + 45W' },
     ],
     colors: [
       { name: 'Branco First Row', hex: '#f2f0ea', imageUrl: '/images/c71-white.webp' },
@@ -190,7 +190,7 @@ export const productsData: Product[] = [
       { label: 'Processador', value: 'Snapdragon 685 4G' },
       { label: 'Tela', value: '6.72” 90Hz FHD+' },
       { label: 'Memória', value: '8GB RAM | 256GB ROM' },
-      { label: 'Bateria', value: '7000mAh + 33W' },
+      { label: 'Bateria', value: '7000mAh + 45W' },
     ],
     colors: [
       { name: 'Azul Celeste', hex: '#2f5fa8', imageUrl: '/images/c85-blue.webp' },
@@ -299,7 +299,7 @@ export const productsData: Product[] = [
       { label: 'Processador', value: 'Dimensity 6100+ 5G' },
       { label: 'Tela', value: '6.72” 120Hz FHD+' },
       { label: 'Memória', value: '8GB RAM | 256GB ROM' },
-      { label: 'Bateria', value: '6000mAh + 33W' }
+      { label: 'Bateria', value: '6000mAh + 45W' }
     ],
     colors: [
       { name: 'Azul Oceano', hex: '#2f5fa8', imageUrl: '/images/c71-green.webp' },
@@ -359,7 +359,7 @@ export const productsData: Product[] = [
       { label: 'Processador', value: 'MediaTek Helio G85' },
       { label: 'Tela', value: '6.72” 90Hz FHD+' },
       { label: 'Memória', value: '8GB RAM | 256GB ROM' },
-      { label: 'Bateria', value: '6000mAh + 33W' }
+      { label: 'Bateria', value: '6000mAh + 45W' }
     ],
     colors: [
       { name: 'Dourado Cintilante', hex: '#d8c08a', imageUrl: '/images/c75-gold.webp' },
@@ -379,7 +379,7 @@ export const productsData: Product[] = [
       { label: 'Processador', value: 'Unisoc T612 Octa-Core' },
       { label: 'Tela', value: '6.74” 90Hz HD+' },
       { label: 'Memória', value: '6GB RAM | 128GB ROM' },
-      { label: 'Bateria', value: '6000mAh + 33W' }
+      { label: 'Bateria', value: '6000mAh + 45W' }
     ],
     colors: [
       { name: 'Branco First Row', hex: '#f2f0ea', imageUrl: '/images/c71-white.webp' },
@@ -399,7 +399,7 @@ export const productsData: Product[] = [
       { label: 'Processador', value: 'Unisoc T612 Octa-Core' },
       { label: 'Tela', value: '6.74” 90Hz HD+' },
       { label: 'Memória', value: '4GB RAM | 128GB ROM' },
-      { label: 'Bateria', value: '6000mAh + 33W' }
+      { label: 'Bateria', value: '6000mAh + 45W' }
     ],
     colors: [
       { name: 'Branco First Row', hex: '#f2f0ea', imageUrl: '/images/c71-white.webp' },
@@ -419,7 +419,7 @@ export const productsData: Product[] = [
       { label: 'Processador', value: 'Snapdragon 685 4G' },
       { label: 'Tela', value: '6.72” 90Hz FHD+' },
       { label: 'Memória', value: '4GB RAM | 128GB ROM' },
-      { label: 'Bateria', value: '5000mAh + 33W' }
+      { label: 'Bateria', value: '5000mAh + 45W' }
     ],
     colors: [
       { name: 'Azul Celeste', hex: '#2f5fa8', imageUrl: '/images/c85-blue.webp' },
