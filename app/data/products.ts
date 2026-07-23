@@ -302,8 +302,8 @@ export const productsData: Product[] = [
       { label: 'Bateria', value: '6000mAh + 45W' }
     ],
     colors: [
-      { name: 'Azul Oceano', hex: '#2f5fa8', imageUrl: '/images/c71-green.webp' },
-      { name: 'Preto Noite', hex: '#1c1c1e', imageUrl: '/images/c71-white.webp' }
+      { name: 'Azul Oceano', hex: '#3e554f', imageUrl: '/images/c71-green.webp' },
+      { name: 'Preto Noite', hex: '#f2f2f7', imageUrl: '/images/c71-white.webp' }
     ],
     priceDebit: 'R$ 2.247,00',
     priceCredit: '12x de R$ 187,25',
@@ -362,8 +362,8 @@ export const productsData: Product[] = [
       { label: 'Bateria', value: '6000mAh + 45W' }
     ],
     colors: [
-      { name: 'Dourado Cintilante', hex: '#d8c08a', imageUrl: '/images/c75-gold.webp' },
-      { name: 'Preto Tempestade', hex: '#1a1a1a', imageUrl: '/images/c75-black.webp' }
+      { name: 'Verde Cintilante', hex: '#2f534a', imageUrl: '/images/c73-Green.webp' },
+      { name: 'Violet-Parrot', hex: '#a05a9c', imageUrl: '/images/c73-Violet-Parrot.webp' }
     ],
     priceDebit: 'R$ 2.247,00',
     priceCredit: '12x de R$ 187,25',
@@ -687,11 +687,11 @@ export const productsData: Product[] = [
     ],
     colors: [
       { name: 'Roxo Espacial', hex: '#6917a0', imageUrl: '/images/P4 Lite-Roxo Espacial.webp' },
-      { name: 'Prata Robusto', hex: '#a1a1a7', imageUrl: '/images/P4 Lite-Prata Robusto.webp' }
+      { name: 'Prata Robusto', hex: '#a1a1a7', imageUrl: '/images/P4 Lite-Prata - Robusto.webp' }
     ],
     priceDebit: 'R$ 2.147,00',
     priceCredit: '12x de R$ 178,91',
-    paymentNote: officialDisclaimer,
+    paymentNote: officialDisclaimer, 
     hasNFC: true
   },
   {
@@ -727,7 +727,7 @@ export const productsData: Product[] = [
     ],
     colors: [
       { name: 'Roxo Espacial', hex: '#6917a0', imageUrl: '/images/P4 Lite-Roxo Espacial.webp' },
-      { name: 'Prata Robusto', hex: '#a1a1a7', imageUrl: '/images/P4 Lite-Prata Robusto.webp' }
+      { name: 'Prata Robusto', hex: '#a1a1a7', imageUrl: '/images/P4 Lite-Prata - Robusto.webp' }
     ],
     priceDebit: 'R$ 2.147,00',
     priceCredit: '12x de R$ 178,91',
@@ -791,7 +791,7 @@ export const productsData: Product[] = [
     ],
     colors: [
       { name: 'Gold ', hex: '#ccc897', imageUrl: '/images/AIR7 NORMAL-Gold.webp' },
-      { name: 'Verde marfin ', hex: '#1c1c1e', imageUrl: '/images/AIR7 NORMAL-marfin.webp' }
+      { name: 'Verde marfin ', hex: '#2f3833', imageUrl: '/images/AIR7 NORMAL-marfin.webp' }
     ],
     priceDebit: 'R$ 590,00',
     priceCredit: '12x de R$ 49,16',
