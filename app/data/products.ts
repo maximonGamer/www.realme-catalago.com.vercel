@@ -790,7 +790,7 @@ export const productsData: Product[] = [
       { label: 'Conexão', value: 'Bluetooth 5.3' }
     ],
     colors: [
-      { name: 'Gold ', hex: '#ccc897', imageUrl: '/images/AIR7 NORMAL-Gold.webp' },
+      { name: 'Gold ', hex: '#bbb67a', imageUrl: '/images/AIR7 NORMAL-Gold.webp' },
       { name: 'Verde marfin ', hex: '#2f3833', imageUrl: '/images/AIR7 NORMAL-marfin.webp' }
     ],
     priceDebit: 'R$ 590,00',
