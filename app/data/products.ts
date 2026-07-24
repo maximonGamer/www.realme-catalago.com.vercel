@@ -127,7 +127,7 @@ export const productsData: Product[] = [
     name: 'C71 4G 256/8',
     highlight: 'Design refinado e ótima capacidade de armazenamento.',
     specs: [
-      { label: 'Processador', value: 'Unisoc T612 Octa-Core' },
+      { label: 'Processador', value: 'Unisoc T7250 Octa-Core' },
       { label: 'Tela', value: '6.74” 90Hz HD+' },
       { label: 'Memória', value: '8GB RAM | 256GB ROM' },
       { label: 'Bateria', value: '6000mAh + 45W' },
@@ -167,7 +167,7 @@ export const productsData: Product[] = [
     name: 'C100i 128/4',
     highlight: 'O novo padrão de entrada da realme.',
     specs: [
-      { label: 'Processador', value: 'Unisoc T612 Octa-Core' },
+      { label: 'Processador', value: 'Unisoc T7250 Octa-Core' },
       { label: 'Tela', value: '6.74” 90Hz HD+' },
       { label: 'Memória', value: '4GB RAM | 128GB ROM' },
       { label: 'Bateria', value: '7000mAh' },
@@ -214,7 +214,7 @@ export const productsData: Product[] = [
       { label: 'Processador', value: 'Dimensity 6300 5G' },
       { label: 'Tela', value: '6.67” 120Hz AMOLED' },
       { label: 'Memória', value: '8GB RAM | 256GB ROM' },
-      { label: 'Bateria', value: '5000mAh + 45W' },
+      { label: 'Bateria', value: '6000mAh + 45W' },
     ],
     colors: [
       { name: 'Marrom Couro', hex: '#313030', imageUrl: '/images/14t-brown.webp' },
@@ -231,7 +231,7 @@ export const productsData: Product[] = [
     name: '14 5G 256/8',
     highlight: 'Estilo cibernético e fluidez visual de ponta.',
     specs: [
-      { label: 'Processador', value: 'Dimensity 7050 5G' },
+      { label: 'Processador', value: 'Snapdragon 6 Gen 4 5G' },
       { label: 'Tela', value: '6.67” 120Hz AMOLED' },
       { label: 'Memória', value: '8GB RAM | 256GB ROM' },
       { label: 'Bateria', value: '5000mAh + 67W SUPERVOOC' },
@@ -296,7 +296,7 @@ export const productsData: Product[] = [
     name: 'C71 5G 256/8',
     highlight: 'Conexão de altíssima velocidade para a linha C.',
     specs: [
-      { label: 'Processador', value: 'Dimensity 6100+ 5G' },
+      { label: 'Processador', value: 'Dimensity 6300 5G' },
       { label: 'Tela', value: '6.72” 120Hz FHD+' },
       { label: 'Memória', value: '8GB RAM | 256GB ROM' },
       { label: 'Bateria', value: '6000mAh + 45W' }
@@ -356,7 +356,7 @@ export const productsData: Product[] = [
     name: 'C73 256/8GB',
     highlight: 'Câmera versátil e design ultrafino.',
     specs: [
-      { label: 'Processador', value: 'MediaTek Helio G85' },
+      { label: 'Processador', value: 'Unisoc T7250 Octa-Core' },
       { label: 'Tela', value: '6.72” 90Hz FHD+' },
       { label: 'Memória', value: '8GB RAM | 256GB ROM' },
       { label: 'Bateria', value: '6000mAh + 45W' }
@@ -376,7 +376,7 @@ export const productsData: Product[] = [
     name: 'C71 4G 128/6',
     highlight: 'Ótimo gerenciamento multitarefa.',
     specs: [
-      { label: 'Processador', value: 'Unisoc T612 Octa-Core' },
+      { label: 'Processador', value: 'Unisoc T7250 Octa-Core' },
       { label: 'Tela', value: '6.74” 90Hz HD+' },
       { label: 'Memória', value: '6GB RAM | 128GB ROM' },
       { label: 'Bateria', value: '6000mAh + 45W' }
@@ -396,7 +396,7 @@ export const productsData: Product[] = [
     name: 'C71 4G 128/4',
     highlight: 'Elegância e conectividade essencial.',
     specs: [
-      { label: 'Processador', value: 'Unisoc T612 Octa-Core' },
+      { label: 'Processador', value: 'Unisoc T7250 Octa-Core' },
       { label: 'Tela', value: '6.74” 90Hz HD+' },
       { label: 'Memória', value: '4GB RAM | 128GB ROM' },
       { label: 'Bateria', value: '6000mAh + 45W' }
@@ -456,10 +456,10 @@ export const productsData: Product[] = [
     name: 'C100i 256/4',
     highlight: 'Tela ampla e bateria projetada para durar.',
     specs: [
-      { label: 'Processador', value: 'Unisoc T612 Octa-Core' },
+      { label: 'Processador', value: 'Unisoc T7250 Octa-Core' },
       { label: 'Tela', value: '6.74” 90Hz HD+' },
       { label: 'Memória', value: '4GB RAM | 256GB ROM' },
-      { label: 'Bateria', value: '5000mAh' }
+      { label: 'Bateria', value: '7000mAh' }
     ],
     colors: [
       { name: 'Violeta Místico', hex: '#bf9fe6', imageUrl: '/images/c100i-purple.webp' },
@@ -533,13 +533,13 @@ export const productsData: Product[] = [
   {
     id: '14-256-12',
     series: 'Linha Number',
-    name: '14 256/12',
+    name: '14 512/12',
     highlight: 'Muito mais RAM para máxima fluidez.',
     specs: [
-      { label: 'Processador', value: 'Dimensity 7050 5G' },
+      { label: 'Processador', value: 'Snapdragon 6 Gen 4 5G' },
       { label: 'Tela', value: '6.67” 120Hz AMOLED' },
       { label: 'Memória', value: '12GB RAM | 256GB ROM' },
-      { label: 'Bateria', value: '5000mAh + 67W SUPERVOOC' }
+      { label: 'Bateria', value: '6000mAh + 67W SUPERVOOC' }
     ],
     colors: [
       { name: 'Prata Cibernético', hex: '#c9cdd3', imageUrl: '/images/14-silver.webp' },
@@ -550,26 +550,7 @@ export const productsData: Product[] = [
     paymentNote: officialDisclaimer,
     hasNFC: true
   },
-  {
-    id: '14-512-12',
-    series: 'Linha Number',
-    name: '14 512/12',
-    highlight: 'A verdadeira máquina multitarefas.',
-    specs: [
-      { label: 'Processador', value: 'Dimensity 7050 5G' },
-      { label: 'Tela', value: '6.67” 120Hz AMOLED' },
-      { label: 'Memória', value: '12GB RAM | 512GB ROM' },
-      { label: 'Bateria', value: '5000mAh + 67W SUPERVOOC' }
-    ],
-    colors: [
-      { name: 'Prata Cibernético', hex: '#c9cdd3', imageUrl: '/images/14-silver.webp' },
-      { name: 'Rosa Cyber', hex: '#e8a0c0', imageUrl: '/images/14-pink.webp' }
-    ],
-    priceDebit: 'R$ 3.547,00',
-    priceCredit: '12x de R$ 295,58',
-    paymentNote: officialDisclaimer,
-    hasNFC: true
-  },
+  
   {
     id: '14-pro-5g-256-12',
     series: 'Linha Number',
@@ -579,7 +560,7 @@ export const productsData: Product[] = [
       { label: 'Processador', value: 'Snapdragon 7s Gen 3 5G' },
       { label: 'Tela', value: '6.7” 120Hz OLED Curva' },
       { label: 'Memória', value: '12GB RAM | 256GB ROM' },
-      { label: 'Bateria', value: '5000mAh + 67W SUPERVOOC' }
+      { label: 'Bateria', value: '6000mAh + 67W SUPERVOOC' }
     ],
     colors: [
       { name: 'Branco Pérola', hex: '#f0eee6', imageUrl: '/images/14pro-white.webp' },
@@ -616,10 +597,10 @@ export const productsData: Product[] = [
     name: '15 PRO 512/12',
     highlight: 'O próximo nível em velocidade e tela imersiva.',
     specs: [
-      { label: 'Processador', value: 'Snapdragon 7 Gen 3 5G' },
+      { label: 'Processador', value: 'Snapdragon 7 Gen 4 5G' },
       { label: 'Tela', value: '6.7” 144Hz OLED Curva' },
       { label: 'Memória', value: '12GB RAM | 512GB ROM' },
-      { label: 'Bateria', value: '5200mAh + 100W SUPERVOOC' }
+      { label: 'Bateria', value: '7000mAh + 100W SUPERVOOC' }
     ],
     colors: [
       { name: 'Branco Espacial', hex: '#e9ebec', imageUrl: '/images/15Branco Espacial.webp' },
@@ -660,7 +641,7 @@ export const productsData: Product[] = [
     name: 'C85 5G 256/8',
     highlight: 'O poder do 5G otimizado para o cotidiano.',
     specs: [
-      { label: 'Processador', value: 'Dimensity 6100+ 5G' },
+      { label: 'Processador', value: 'Dimensity 6300 5G' },
       { label: 'Tela', value: '6.72” 120Hz FHD+' },
       { label: 'Memória', value: '8GB RAM | 256GB ROM' },
       { label: 'Bateria', value: '5000mAh + 33W' }
@@ -683,7 +664,7 @@ export const productsData: Product[] = [
       { label: 'Processador', value: ' MediaTek Dimensity 6300' },
       { label: 'Tela', value: '6.7” 120Hz AMOLED' },
       { label: 'Memória', value: '8GB RAM | 256GB ROM' },
-      { label: 'Bateria', value: '6.600mAh + 45W' }
+      { label: 'Bateria', value: '7.000mAh + 45W' }
     ],
     colors: [
       { name: 'Roxo Espacial', hex: '#6917a0', imageUrl: '/images/P4 Lite-Roxo Espacial.webp' },
@@ -723,7 +704,7 @@ export const productsData: Product[] = [
       { label: 'Processador', value: ' MediaTek Dimensity 6300' },
       { label: 'Tela', value: '6.7” 120Hz AMOLED' },
       { label: 'Memória', value: '4GB RAM | 256GB ROM' },
-      { label: 'Bateria', value: '6.600mAh + 45W' }
+      { label: 'Bateria', value: '7.000mAh + 45W' }
     ],
     colors: [
       { name: 'Roxo Espacial', hex: '#6917a0', imageUrl: '/images/P4 Lite-Roxo Espacial.webp' },
